@@ -6,6 +6,11 @@ import java.io.IOException;
 import java.net.Socket;
 
 import SK.Utility.UCPIDResponse;
+import SK.Utils.ClientUtils;
+import SK.Utils.RequestUtils;
+import SK.Utils.ResponseUtils;
+import SK.Utils.StatusUtils;
+import SK.Utils.VarUtils;
 
 public class Test {
 
@@ -32,12 +37,12 @@ public class Test {
 		String ucpidNonceInApi = "마이데이터 사업자로부터 api-002를 통해 전달 받은 ucpidNonce 값";
 		String consentNonceInApi = "마이데이터 사업자로부터 api-002를 통해 전달 받은 consentNonce 값";
 		
-		if(ucpidNonceInCms.equals(ucpidNonceInApi) && consentNonceInCms.equals(consentNonceInApi)){//nonce 값이 동일할 경우 (재전송공격 방지)
-			if(isSameCertificate(personCert,consentCert)){ // byte 배열이 동일한 지 확인하는 함수 정보제공자가 개발 필요 
+		if (ucpidNonceInCms.equals(ucpidNonceInApi) && consentNonceInCms.equals(consentNonceInApi)) {//nonce 값이 동일할 경우 (재전송공격 방지)
+			if (isSameCertificate(personCert,consentCert)) { // byte 배열이 동일한 지 확인하는 함수 정보제공자가 개발 필요 
 				/*
 				 * 위의 personInfoForVerify, consentInfoForVerify 값을 검증데몬 혹은 검증라이브러리에 파라미터값으로 넣어 서명 검증 및 인증서 유효성 검증 실시. 
 				 */
-				if(isVerifyingOk()){ //검증이 정상적으로 완료되었을 경우
+				if (isVerifyingOk()) { //검증이 정상적으로 완료되었을 경우
 					//properties 파일 위치 설정. (절대경로 혹은 상대 경로 모두 가능)
 					VarUtils.setPropertiesPath("config_data/route.properties");
 					
@@ -48,7 +53,7 @@ public class Test {
 					String signCertPath = VarUtils.getResourceFromProperty("signCert");
 					byte[] certificate = VarUtils.getFromFile(signCertPath);
 					
-					if("SignKorea".equals(ca_code)){						
+					if ("SignKorea".equals(ca_code)) {
 						String serverIp = "211.175.81.101"; //koscom ucpid test server ip
 						int serverPort = 8098; //koscom ucpid test server port
 						/**
@@ -57,7 +62,7 @@ public class Test {
 						 */
 						byte[] UCPIDRequest = RequestUtils.getUCPIDRequest(ucpIdNonce, cpCode, cpRequestNumber, certificate, signed_personInfoReq, 1);
 						System.out.println("request to ucpid server is started.");
-						byte[] bUCPIDResponse = request2UCPID(UCPIDRequest, serverIp, serverPort);
+						byte[] bUCPIDResponse = request2UCPID(UCPIDRequest, serverIp, serverPort);  // connect to the server
 						System.out.println("request to ucpid server is successfully done.");
 						
 						/**
@@ -66,7 +71,7 @@ public class Test {
 						 */
 						String status = ResponseUtils.getStatusCode(bUCPIDResponse); 
 						
-						if(StatusUtils.isOk(status)){
+						if (StatusUtils.isOk(status)) {
 							UCPIDResponse ucpidResponse = ResponseUtils.getInstance(bUCPIDResponse);
 							
 							int version = ucpidResponse.getVersion();
@@ -82,7 +87,6 @@ public class Test {
 							int ciupdate = ucpidResponse.getCiUpdate();
 							String ci = ucpidResponse.getCi();
 							String ci2 = ucpidResponse.getCi2();
-
 						} else {
 							System.out.println("your UCPIDResponse is invalid. your error code is \"" + status + "\"");
 						}
@@ -91,39 +95,40 @@ public class Test {
 			}
 		}
 	}
-	public static byte[] request2UCPID(byte[] UCPIDRequest,String serverIp, int serverPort){
+	
+	public static byte[] request2UCPID(byte[] UCPIDRequest, String serverIp, int serverPort) {
 		
 		Socket socket = null;
 		DataInputStream reader = null;
 		DataOutputStream writer = null;
 		byte[] UCPIDResponse = null;
 		
-		try{
+		try {
 			socket = new Socket(serverIp, serverPort);
-			if(socket != null){
-				if(socket.isConnected()){
+			if (socket != null) {
+				if (socket.isConnected()) {
 					
 					writer = new DataOutputStream(socket.getOutputStream());
-					if(writer != null){
+					if (writer != null) {
 						writer.writeInt(UCPIDRequest.length);
 						writer.write(UCPIDRequest,0,UCPIDRequest.length);
 						writer.flush();
 					}
 					reader = new DataInputStream(socket.getInputStream());
-					if(reader!=null){
+					if (reader!=null) {
 						int readInt = reader.readInt();
 						UCPIDResponse = new byte[readInt];
 						reader.readFully(UCPIDResponse);
 					}
 				}
 			}
-		}catch(IOException e){
+		} catch (IOException e) {
 			e.printStackTrace();
-		}finally{
+		} finally {
 				try {
-					if(socket!=null) socket.close();
-					if(writer!=null) writer.close();
-					if(reader!=null) reader.close();
+					if (socket!=null) socket.close();
+					if (writer!=null) writer.close();
+					if (reader!=null) reader.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

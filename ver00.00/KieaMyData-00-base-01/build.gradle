@@ -16,6 +16,11 @@ configurations {
 
 repositories {
 	mavenCentral()
+	
+	// local dir
+	flatDir {
+		dirs 'libs'
+	}
 }
 
 dependencies {
@@ -28,6 +33,16 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	
+	// include the local jars, if no flatDir
+	//implementation fileTree(dir: 'libs', include: ['*.jar'])
+	
+	// the below if declare the flatDir above
+	implementation name: 'bcpkix-jdk15on-1.59'
+	implementation name: 'bcprov-jdk15on-1.59'
+	implementation name: 'local_policy'
+	implementation name: 'mydata_v1.9.3'
+	implementation name: 'US_export_policy'
 }
 
 test {
