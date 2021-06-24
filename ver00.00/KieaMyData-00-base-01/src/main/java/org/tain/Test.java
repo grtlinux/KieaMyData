@@ -38,7 +38,7 @@ public class Test {
 		String consentNonceInApi = "마이데이터 사업자로부터 api-002를 통해 전달 받은 consentNonce 값";
 		
 		if (ucpidNonceInCms.equals(ucpidNonceInApi) && consentNonceInCms.equals(consentNonceInApi)) {//nonce 값이 동일할 경우 (재전송공격 방지)
-			if (isSameCertificate(personCert,consentCert)) { // byte 배열이 동일한 지 확인하는 함수 정보제공자가 개발 필요 
+			if (isSameCertificate(personCert, consentCert)) { // byte 배열이 동일한 지 확인하는 함수 정보제공자가 개발 필요 
 				/*
 				 * 위의 personInfoForVerify, consentInfoForVerify 값을 검증데몬 혹은 검증라이브러리에 파라미터값으로 넣어 서명 검증 및 인증서 유효성 검증 실시. 
 				 */
@@ -54,16 +54,34 @@ public class Test {
 					byte[] certificate = VarUtils.getFromFile(signCertPath);
 					
 					if ("SignKorea".equals(ca_code)) {
-						String serverIp = "211.175.81.101"; //koscom ucpid test server ip
-						int serverPort = 8098; //koscom ucpid test server port
 						/**
 						 * signedAttirbute 존재 > flag : 1
 						 * signedAttribute 존재 x > flag : 0 
 						 */
 						byte[] UCPIDRequest = RequestUtils.getUCPIDRequest(ucpIdNonce, cpCode, cpRequestNumber, certificate, signed_personInfoReq, 1);
-						System.out.println("request to ucpid server is started.");
-						byte[] bUCPIDResponse = request2UCPID(UCPIDRequest, serverIp, serverPort);  // connect to the server
-						System.out.println("request to ucpid server is successfully done.");
+						byte[] bUCPIDResponse = null;
+						
+						if (Boolean.TRUE) {
+							long elapsedMilliStart = System.currentTimeMillis();
+							long elapsedNonoStart = System.nanoTime();
+							
+							System.out.println(">>>>> request to ucpid server is started.");
+							
+							String serverIp = "211.175.81.101"; //koscom ucpid test server ip
+							int serverPort = 8098; //koscom ucpid test server port
+							bUCPIDResponse = request2UCPID(UCPIDRequest, serverIp, serverPort);  // connect to the server
+							
+							System.out.println(">>>>> request to ucpid server is successfully done.");
+							
+							long elapsedMilliFinish = System.currentTimeMillis();
+							long elapsedNonoFinish = System.nanoTime();
+							
+							long timeElapsedMilli = elapsedMilliFinish - elapsedMilliStart;
+							long timeElapsedNono = elapsedNonoFinish - elapsedNonoStart;
+							
+							System.out.println(">>>>> time elapsed by milli: " + timeElapsedMilli);
+							System.out.println(">>>>> time elapsed by nono: " + timeElapsedNono);
+						}
 						
 						/**
 						 * get ucpidResponse's status
