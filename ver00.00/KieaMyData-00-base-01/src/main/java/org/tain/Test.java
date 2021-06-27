@@ -14,7 +14,8 @@ import SK.Utils.VarUtils;
 
 public class Test {
 
-	public static void main(String[] args) {
+	@SuppressWarnings("unused")
+	public static void _main(String[] args) {
 
 		String person_encoded = "마이데이터 사업자로부터 넘어온 signed_personInfoReq url-safe encoding 된 값";
 		String consent_encode = "마이데이터 사업자로부터 넘어온 signed_consentInfo url-safe encoding 된 값";
@@ -114,6 +115,16 @@ public class Test {
 		}
 	}
 	
+	private static boolean isVerifyingOk() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	private static boolean isSameCertificate(byte[] personCert, byte[] consentCert) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	public static byte[] request2UCPID(byte[] UCPIDRequest, String serverIp, int serverPort) {
 		
 		Socket socket = null;
