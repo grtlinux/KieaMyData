@@ -59,7 +59,13 @@ public class _Test {
 						 * signedAttirbute 존재 > flag : 1
 						 * signedAttribute 존재 x > flag : 0 
 						 */
-						byte[] UCPIDRequest = RequestUtils.getUCPIDRequest(ucpIdNonce, cpCode, cpRequestNumber, certificate, signed_personInfoReq, 1);
+						byte[] bUCPIDRequest = RequestUtils.getUCPIDRequest(
+								ucpIdNonce
+								, cpCode
+								, cpRequestNumber
+								, certificate
+								, signed_personInfoReq
+								, 1);
 						byte[] bUCPIDResponse = null;
 						
 						if (Boolean.TRUE) {
@@ -70,7 +76,7 @@ public class _Test {
 							
 							String serverIp = "211.175.81.101"; //koscom ucpid test server ip
 							int serverPort = 8098; //koscom ucpid test server port
-							bUCPIDResponse = request2UCPID(UCPIDRequest, serverIp, serverPort);  // connect to the server
+							bUCPIDResponse = request2UCPID(bUCPIDRequest, serverIp, serverPort);  // connect to the server
 							
 							System.out.println(">>>>> request to ucpid server is successfully done.");
 							
@@ -154,13 +160,13 @@ public class _Test {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-				try {
-					if (socket!=null) socket.close();
-					if (writer!=null) writer.close();
-					if (reader!=null) reader.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			try {
+				if (socket!=null) socket.close();
+				if (writer!=null) writer.close();
+				if (reader!=null) reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		return UCPIDResponse;
 	}

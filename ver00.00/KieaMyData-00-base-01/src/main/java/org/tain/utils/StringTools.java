@@ -1,10 +1,14 @@
 package org.tain.utils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -125,6 +129,16 @@ public class StringTools {
 		}
 	}
 	
+	// KANG-20210515
+	public static byte[] bytesFromFile(String filePath) throws Exception {
+		return Files.readAllBytes(new File(filePath).toPath());
+	}
+	
+	// KANG-20210515
+	public static void bytesToFile(byte[] bData, String filePath) throws Exception {
+		Files.write(Paths.get(filePath), bData);
+	}
+	
 	///////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////
@@ -177,5 +191,74 @@ public class StringTools {
 			url = url.substring(pos + 1);
 		}
 		return url;
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+	
+	private static final String PRINT_HEX_CHARSET = "euc-kr";
+	//private static final String PRINT_HEX_CHARSET = "utf-8";
+	
+	public static void printHexAllAscii() throws Exception {
+		if (Boolean.TRUE) {
+			byte[] bData = new byte[256];
+			for (int i=0x00; i <= 0xff; i++) {
+				bData[i] = (byte) i;
+			}
+			printHex(bData);
+		}
+	}
+	
+	public static void printHex(String strData) throws UnsupportedEncodingException, Exception {
+		printHex(strData.getBytes(PRINT_HEX_CHARSET));
+	}
+	
+	public static void printHex(final byte[] bData) throws Exception {
+		
+		int lenData = bData.length;
+		System.out.println("Size: " + lenData);
+		System.out.println("Offset--  Hex--------------------- ------------------------  Data-------------");
+		
+		StringBuffer sb = new StringBuffer();
+		StringBuffer sb1 = new StringBuffer();
+		StringBuffer sb2 = new StringBuffer();
+		StringBuffer sb3 = new StringBuffer();
+		int maxLen = (lenData + 15) / 16 * 16;
+		for (int i=0; i < maxLen; i += 16) {
+			int begSec = i;
+			int midSec = i + 8;
+			int endSec = i + 16;
+			sb1.setLength(0);
+			sb2.setLength(0);
+			sb3.setLength(0);
+			
+			sb1.append(String.format("%08d", begSec));
+			for (int j=begSec; j < endSec; j++) {
+				if (j == midSec) {
+					sb2.append(" ");
+					sb3.append(" ");
+				}
+				if (j < lenData) {
+					sb2.append(String.format("%02X ", bData[j] & 0xff));
+					//char ch = (char)(bData[j] & 0xFF);
+					// if (Character.isLetterOrDigit(ch)) {
+					if (0x20 <= bData[j] && bData[j] < 0x7f) {
+						sb3.append((char)(bData[j] & 0xFF));
+					} else {
+						sb3.append('.');
+					}
+				} else {
+					sb2.append("   ");
+					sb3.append(" ");
+				}
+			}
+			sb.append(sb1.toString()).append("  ");
+			sb.append(sb2.toString()).append("  ");
+			sb.append(sb3.toString()).append('\n');
+			System.out.println(sb1.toString() + "  " + sb2.toString() + "  " + sb3.toString());
+		}
+		//System.out.println(sb.toString());
+		System.out.println("--------  ------------------------ ------------------------  -------- --------");
 	}
 }
