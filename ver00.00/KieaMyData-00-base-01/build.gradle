@@ -24,6 +24,21 @@ repositories {
 }
 
 dependencies {
+	// manual for org.apache.http
+	implementation 'org.apache.httpcomponents:httpclient'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:2.8.4'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	implementation 'com.github.mervick:aes-everywhere-java:1.2.7'
+	
+	// import org.apache.commons.io.filefilter.WildcardFileFilter;
+	implementation 'commons-io:commons-io:2.6'
+	
+	// Java-WebSocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
@@ -46,5 +61,6 @@ dependencies {
 }
 
 test {
+	exclude '**/*'      // gradle build --exclude-task test
 	useJUnitPlatform()
 }

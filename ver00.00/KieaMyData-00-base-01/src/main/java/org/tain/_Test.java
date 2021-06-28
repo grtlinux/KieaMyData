@@ -12,7 +12,7 @@ import SK.Utils.ResponseUtils;
 import SK.Utils.StatusUtils;
 import SK.Utils.VarUtils;
 
-public class Test {
+public class _Test {
 
 	@SuppressWarnings("unused")
 	public static void _main(String[] args) {
