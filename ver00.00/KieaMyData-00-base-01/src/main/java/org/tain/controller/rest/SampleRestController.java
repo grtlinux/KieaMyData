@@ -59,10 +59,11 @@ public class SampleRestController {
 			headers = new LinkedMultiValueMap<>();
 			headers.add(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
 		}
-		return new ResponseEntity<>(nodeRes.getJsonNode(), headers, HttpStatus.OK);
+		//return new ResponseEntity<>(nodeRes.getJsonNode(), headers, HttpStatus.OK);
+		return new ResponseEntity<>("Hello world!!!", headers, HttpStatus.OK);
 	}
 	
-	@SuppressWarnings("unused")
+	//@SuppressWarnings("unused")
 	private void testJob(MonJsonNode nodeReq, MonJsonNode nodeRes) throws Exception {
 		
 		if (Boolean.TRUE) {
