@@ -145,7 +145,7 @@ proj-env:
 # proj-local
 spring:
   # profiles: proj-air
-  config.activate.on-profile: proj-air
+  config.activate.on-profile: proj-airs
 
 proj-env:
   param:
