@@ -150,8 +150,9 @@ spring:
 proj-env:
   param:
     name: PARAM (air)
-    org: SignKorea_211.175.81.101_8098,yessign_203.233.91.231_4719,KICA_121.254.88.161_9090,CrossCert_203.248.34.63_17586
-    daemon: 127.0.0.1_7800
+    lst-Org: SignKorea_211.175.81.101_8098,yessign_203.233.91.231_4719,KICA_121.254.88.161_9090,CrossCert_203.248.34.63_17586
+    #daemon: 127.0.0.1_7800
+    daemon: 127.0.0.1_0
   job:
     name: JOB (air)
   json:

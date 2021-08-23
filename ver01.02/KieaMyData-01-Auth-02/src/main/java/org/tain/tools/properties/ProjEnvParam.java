@@ -14,7 +14,7 @@ public class ProjEnvParam {
 
 	private String name;  // default
 	
-	private List<String> org;
+	private List<String> lstOrg;
 	private String daemon;
 	
 	private String dummy;  // null

@@ -292,8 +292,8 @@ public class SampleRestController {
 	 * curl -X POST -H "Content-Type: application/json" -d @./1test.json http://localhost:8080/v0.1/rest/test1
 	 */
 	@CrossOrigin(origins="*", methods = {RequestMethod.POST}, maxAge = 3600)
-	@RequestMapping(value = {"/test1"}, method = {RequestMethod.GET, RequestMethod.POST})
-	public ResponseEntity<?> test1(HttpEntity<String> httpEntity) throws Exception {
+	@RequestMapping(value = {"/auth"}, method = {RequestMethod.GET, RequestMethod.POST})
+	public ResponseEntity<?> auth01(HttpEntity<String> httpEntity) throws Exception {
 		MonJsonNode nodeReq = null;
 		if (Boolean.TRUE) {
 			HttpHeaders headers = httpEntity.getHeaders();
