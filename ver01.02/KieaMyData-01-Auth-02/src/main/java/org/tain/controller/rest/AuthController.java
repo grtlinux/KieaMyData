@@ -27,9 +27,7 @@ import org.tain.tools.properties.ProjEnvParam;
 import org.tain.utils.IpPrint;
 import org.tain.utils.StringTools;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.signkorea.sign.SKSignedDataInfo;
 import com.signkorea.sign.SKVerifyExtInfo;
@@ -196,10 +194,10 @@ public class AuthController {
 						ucpidNonce = Base64.encodeBase64URLSafeString(ucpidNonce.getBytes());
 						
 						//String cpCode ="정보제공자 cpCode (한국정보인증에 신청)"; // Test cpCode C0123456789A(ispurl www.mydata.co.kr)
-						//String cpCode = nodeIn.get("orgCode").asText("C0123456789A");
 						String cpCode = "C0123456789A";
+						//String cpCode = nodeIn.get("orgCode").asText("C0123456789A");
 						//String cpRequestNumber = "마이데이터사업자로부터 받은 tx_id 값";
-						String cpRequestNumber = "12345";
+						String cpRequestNumber = "123459";
 						//String ca_code ="마이데이터사업자로부터 받은 인증기관 기관코드"; // SignKorea / yessign / KICA / CrossCert
 						
 						//String ca_code = (String) mapIn.get("caOrg");
@@ -362,9 +360,9 @@ public class AuthController {
 		
 		/***************************************************************************************
 		verifySignCipher
-		data_info.opcode = 58	
+		data_info.opcode = 58
 		***************************************************************************************/
-
+		
 		System.out.println("\n********************************************************************");
 		System.out.println("CMS verify");
 
