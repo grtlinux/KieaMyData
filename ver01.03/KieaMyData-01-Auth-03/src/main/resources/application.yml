@@ -6,7 +6,7 @@
 server:
   port: 8080
   servlet:
-    context-path: /v0.1
+    #context-path: /v0.1
     encoding:
       charset: utf-8
       enabled: true
@@ -145,7 +145,7 @@ proj-env:
 # proj-local
 spring:
   # profiles: proj-air
-  config.activate.on-profile: proj-airs
+  config.activate.on-profile: proj-air
 
 proj-env:
   param:
@@ -154,6 +154,7 @@ proj-env:
     lst-Org: SignKorea_211.175.81.101_8098,yessign_203.233.91.231_4719,KICA_121.254.88.161_9190,CrossCert_203.248.34.63_17586
     #daemon: 127.0.0.1_7800
     daemon: 127.0.0.1_0
+    route-file: /Users/kang-air/KANG/mydata/config/route.properties
   job:
     name: JOB (air)
   json:
