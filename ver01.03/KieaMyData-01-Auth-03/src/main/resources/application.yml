@@ -1,0 +1,164 @@
+
+
+# --------------------------------
+# BASE of MyData Auth
+
+server:
+  port: 8080
+  servlet:
+    context-path: /v0.1
+    encoding:
+      charset: utf-8
+      enabled: true
+      force: true
+      force-request: true
+      force-response: true
+      # mapping: 
+
+
+spring:
+  # legacy method
+  #config.use-legacy-processing: true
+  profiles.active:
+  - proj-default
+  - proj-air
+  #- proj-pro
+  #- proj-aws
+  #- proj-dfep
+  #- proj-real
+
+##  h2.console:
+##    enabled: true
+##    path: /h2
+##    settings:
+##      trace: false
+##      web-allow-others: true
+##  datasource:
+##    url: jdbc:h2:tcp://localhost:9092/monsterdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+##    driverClassName: org.h2.Driver
+##    username: sa
+##    password:
+#    hikari:
+#      jdbc-url: jdbc:h2:tcp://localhost:9092/lightnetdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+#      # jdbc-url: jdbc:h2:tcp://localhost:9092/lightnetdb;MODE=Oracle;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+#      # jdbc-url: jdbc:h2:mem:testdb
+#      driver-class-name: org.h2.Driver
+#      username: sa
+#      password:
+##  jpa:
+##    open-in-view: true
+##    show-sql: true
+##    database: h2
+##    database-platform: org.hibernate.dialect.H2Dialect
+##    hibernate.ddl-auto: update
+##    properties:
+##      hibernate.jdbc.time-zone: UTC+9
+##  data.rest:
+##    base-path: /api
+##    default-page-size: 5
+##    max-page-size: 50
+  thymeleaf:
+    enabled: true
+    encoding: utf-8
+    cache: false
+    prefix: classpath:templates/
+    suffix: .html
+  servlet.multipart:
+    enabled: true
+    location: ~/FILES
+    max-file-size: 5GB
+    max-request-size: 5GB
+  devtools:
+    livereload.enabled: true
+  mandatory-file-encoding: utf-8
+
+
+# %Logger{length} : Logger name을 축약할 수 있다. {length}는 최대 자리 수, ex)logger{35}
+# %-5level : 로그 레벨, -5는 출력의 고정폭 값(5글자)
+# %msg : - 로그 메시지 (=%message)
+# ${PID:-} : 프로세스 아이디
+# %d : 로그 기록시간
+# %p : 로깅 레벨
+# %F : 로깅이 발생한 프로그램 파일명
+# %M : 로깅일 발생한 메소드의 명
+# %l : 로깅이 발생한 호출지의 정보
+# %L : 로깅이 발생한 호출지의 라인 수
+# %thread : 현재 Thread 명
+# %t : 로깅이 발생한 Thread 명
+# %c : 로깅이 발생한 카테고리
+# %C : 로깅이 발생한 클래스 명
+# %m : 로그 메시지
+# %n : 줄바꿈(new line)
+# %% : %를 출력
+# %r : 애플리케이션 시작 이후부터 로깅이 발생한 시점까지의 시간(ms)
+# 
+logging:
+  file:
+    path: logs/mydata/
+    max-size: 10MB
+    max-history: 30         # delete after a month
+  pattern:
+    console: "%clr(%d{HH:mm:ss} %p){magenta} - %m%n"
+    file: "%d %-5level [%-10thread] [%-30logger{30}] - %m%n"
+  level:
+    root: info
+    org.tain.*: info
+    org.tain.mybatis.mappers: trace
+    org.hibernate.SQL: info
+    org.hibernate.type: info
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+    org.thymeleaf: info
+    org.h2.server.web: info
+    
+    #org.tain.utils.TransferStrAndJson: trace
+
+
+---
+# --------------------------------------------------------
+# --------------------------------------------------------
+# --------------------------------------------------------
+spring:
+  #profiles: proj-default
+  config.activate.on-profile: proj-default
+
+proj-env:
+  base:
+    name: MyDataAuth API project
+    program: KieaMyData API program
+    version: ver 1.2_2021.08.16
+    comment: This is MyDataAuth API project.
+    char-set: utf-8
+    #test-flag: true
+    test-flag: false
+    svr-code: MYDATA
+  param:
+    name: PARAM (default)
+  job:
+    name: JOB (default)
+  json:
+    name: JSON (default)
+  url:
+    name: URL (default)
+
+---
+# --------------------------------------------------------
+# proj-local
+spring:
+  # profiles: proj-air
+  config.activate.on-profile: proj-airs
+
+proj-env:
+  param:
+    name: PARAM (air)
+    #lst-Org: SignKorea_211.175.81.101_8098,yessign_203.233.91.231_4719,KICA_121.254.88.161_9090,CrossCert_203.248.34.63_17586
+    lst-Org: SignKorea_211.175.81.101_8098,yessign_203.233.91.231_4719,KICA_121.254.88.161_9190,CrossCert_203.248.34.63_17586
+    #daemon: 127.0.0.1_7800
+    daemon: 127.0.0.1_0
+  job:
+    name: JOB (air)
+  json:
+    name: JSON (air)
+  url:
+    name: URL (air)
+
+
