@@ -1,6 +1,5 @@
 package org.tain.tools.properties;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
@@ -19,17 +18,21 @@ public class MyDataAuthProperties {
 	public void start() throws Exception {
 		log.info(">>>>> START of MyDataAuthProperties <<<<< ");
 		
-		String propertiesFile = System.getProperty("mydata.config.file", "/Users/kang-air/KANG/mydata/MyDataAuth.properties");
+		String propertiesFile = System.getProperty("mydata.config.file", "/Users/kang-air/KANG/mydata/MyDataAuth.properties.");
 		log.info(">>>>> propertiesFile: " + propertiesFile);
 		
-		prop = new Properties();
-		prop.load(new FileInputStream(new File(propertiesFile)));
-		String lstOrg = prop.getProperty("param.lstOrg");
-		String daemon = prop.getProperty("param.daemon");
-		String routeFile = prop.getProperty("file.route");
+		this.prop = new Properties();
+		this.prop.load(new FileInputStream(propertiesFile));
+		String lstOrg = this.prop.getProperty("param.lstOrg");
+		String daemon = this.prop.getProperty("param.daemon");
+		String routeFile = this.prop.getProperty("file.route");
 		
 		log.info(">>>>> lstOrg: " + lstOrg);
 		log.info(">>>>> daemon: " + daemon);
 		log.info(">>>>> routeFile: " + routeFile);
+	}
+	
+	public String get(String key) {
+		return this.prop.getProperty(key);
 	}
 }

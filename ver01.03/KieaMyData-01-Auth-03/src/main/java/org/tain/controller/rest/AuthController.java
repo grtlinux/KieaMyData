@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.tain.tools.node.MonJsonNode;
-import org.tain.tools.properties.ProjEnvParam;
+import org.tain.tools.properties.MyDataAuthProperties;
 import org.tain.utils.IpPrint;
 import org.tain.utils.StringTools;
 
@@ -51,7 +51,7 @@ public class AuthController {
 	//private ProjEnvParam projEnvParam;
 	
 	@Autowired
-	private MydataException mydataException;
+	private MyDataAuthProperties prop;
 	
 	/*
 	 * curl -X POST -H "Content-Type: application/json" -d @./1test.json http://localhost:8080/v0.1/rest/auth
@@ -101,9 +101,10 @@ public class AuthController {
 			if (ca_code == null)
 				ca_code = "SignKorea";
 			
-			for (int i=0; i < this.projEnvParam.getLstOrg().size(); i++) {
-				if (this.projEnvParam.getLstOrg().get(i).contains(ca_code)) {
-					String strInfo = this.projEnvParam.getLstOrg().get(i);
+			String[] org = this.prop.get("param.lstOrg").split(",");
+			for (int i=0; i < org.length; i++) {
+				if (org[i].contains(ca_code)) {
+					String strInfo = org[i];
 					String[] arrItem = strInfo.split("_");
 					System.out.println(">>>>> org:" + arrItem[0] + ", ip:" + arrItem[1] + ", port:" + arrItem[2]);
 					orgName = arrItem[0];
@@ -190,7 +191,7 @@ public class AuthController {
 					if (isVerifyingOk(personInfoForVerify) && isVerifyingOk(consentInfoForVerify)) {
 						/* 검증데몬에서 서명데이터의 검증이 정상적으로 성공하였을 경우 */
 						//VarUtils.setPropertiesPath("./config/route.properties");/*properties 파일 설정(절대 경로 혹은 상대경로)*/
-						VarUtils.setPropertiesPath(this.projEnvParam.getRouteFile());/*properties 파일 설정(절대 경로 혹은 상대경로)*/
+						VarUtils.setPropertiesPath(this.prop.get("file.route"));/*properties 파일 설정(절대 경로 혹은 상대경로)*/
 						
 						//String ucpidNonce = "정보제공자가 직접생성한 ucpidNonce";
 						//String ucpidNonce = ucpidNonceInCms;
@@ -344,7 +345,7 @@ public class AuthController {
 	
 	private boolean isVerifyingOk(String signdataPEM) throws IOException
 	{
-		String strInfo = this.projEnvParam.getDaemon();
+		String strInfo = this.prop.get("param.daemon");
 		String[] strItem = strInfo.split("_");
 		
 		int ret;
