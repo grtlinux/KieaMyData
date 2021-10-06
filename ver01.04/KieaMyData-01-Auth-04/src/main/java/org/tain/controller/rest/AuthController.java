@@ -22,12 +22,14 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.tain.tools.httpClient.MonHttpClient;
 import org.tain.tools.node.MonJsonNode;
 import org.tain.tools.properties.MyDataAuthProperties;
 import org.tain.utils.IpPrint;
 import org.tain.utils.StringTools;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.signkorea.sign.SKSignedDataInfo;
 import com.signkorea.sign.SKVerifyExtInfo;
@@ -52,6 +54,9 @@ public class AuthController {
 	
 	@Autowired
 	private MyDataAuthProperties prop;
+	
+	@Autowired
+	private MonHttpClient monHttpClient;
 	
 	/*
 	 * curl -X POST -H "Content-Type: application/json" -d @./1test.json http://localhost:8080/v0.1/rest/auth
@@ -271,7 +276,7 @@ public class AuthController {
 								System.out.println("personInfo's version ==============> " + version);
 								System.out.println("personInfo's UCPIDNonce ===========> " + UCPIDNonce);
 								System.out.println("personInfo's cpRequestNumber ======> " + CpRequestNumber);
-								System.out.println("personInfo's certDn ===============> "+ certDn);
+								System.out.println("personInfo's certDn ===============> " + certDn);
 								System.out.println("personInfo's cpCode ===============> " + CpCode);
 								System.out.println("personInfo's Di ===================> " + di);
 								System.out.println("personInfo's realName =============> " + realName);
@@ -295,11 +300,21 @@ public class AuthController {
 								mapOut.put("ciupdate", ciupdate);
 								mapOut.put("ci", ci);
 								mapOut.put("ci2", ci2);
+								
+								// TODO: store auth data of SUCCESS
+								String storeAuthUrl = this.prop.get("store.auth.url");
+								if (storeAuthUrl != null && !"".equals(storeAuthUrl)) {
+									String strJson = new ObjectMapper().writeValueAsString(mapOut);
+									System.out.println(">>>>> JSON: " + strJson);
+									this.monHttpClient.post(storeAuthUrl, strJson);
+								}
 							}
 							else{
 								System.out.println("your UCPIDResponse is invalid. your error code is \"" + status + "\"");
+								// TODO: store auth data of FAIL-1
 							}
 						}catch(MydataException e){
+							// TODO: store auth data of FIAL-2
 							/**
 							 *
 								서명데이터(UCPIDRequest)가 잘못된경우로 동일로직으로 처리하여도 무관함

@@ -18,7 +18,7 @@ public class MyDataAuthProperties {
 	public void start() throws Exception {
 		log.info(">>>>> START of MyDataAuthProperties <<<<< ");
 		
-		String propertiesFile = System.getProperty("mydata.config.file", "/Users/kang-air/KANG/mydata/MyDataAuth.properties.");
+		String propertiesFile = System.getProperty("mydata.config.file", "/Users/kang-air/KANG/mydata/MyDataAuth.properties");
 		log.info(">>>>> propertiesFile: " + propertiesFile);
 		
 		this.prop = new Properties();
@@ -26,10 +26,12 @@ public class MyDataAuthProperties {
 		String lstOrg = this.prop.getProperty("param.lstOrg");
 		String daemon = this.prop.getProperty("param.daemon");
 		String routeFile = this.prop.getProperty("file.route");
+		String storeAuthUrl = this.prop.getProperty("store.auth.url");
 		
 		log.info(">>>>> lstOrg: " + lstOrg);
 		log.info(">>>>> daemon: " + daemon);
 		log.info(">>>>> routeFile: " + routeFile);
+		log.info(">>>>> storeAuthUrl: " + storeAuthUrl);
 	}
 	
 	public String get(String key) {
