@@ -186,8 +186,7 @@ public class AuthController {
 		
 		//if(ucpidNonceInCms.equals(ucpidNonceInApi) && consentNonceInCms.equals(consentNonceInApi)){ /* Nonce 값이 동일할 경우 (재전송 공격 방지) */
 		{
-				//if(isSameCertificate(personCert,consentCert)){ /* 두 서명 데이터에서 사용된 인증서가 동일할 경우 <- 해당 인증서 비교 함수는 정보제공자가 개발필요 */
-				{
+				if(isSameCertificate(personCert,consentCert)) { /* 두 서명 데이터에서 사용된 인증서가 동일할 경우 <- 해당 인증서 비교 함수는 정보제공자가 개발필요 */
 					/*
 					 * 위의 personInfoForVerify, consentInfoForVerify 값을 검증데몬 혹은 검증라이브러리에 파라미터값으로 넣어 서명 검증 실시.
 						personInfoForVerify - 검증
@@ -346,16 +345,34 @@ public class AuthController {
 					} else{
 						System.out.println("CMS Verify not ok");
 					}
+				} else {
+					System.out.println("isSameCertificate not ok");
 				}
-				//else{
-				//	System.out.println("isSameCertificate not ok");
-				//}
 		}
 		//else{
 		//	System.out.println("Nonce not ok");
 		//}
 		
 		return mapOut;
+	}
+	
+	private boolean isSameCertificate(byte[] personCert, byte[] consentCert) throws Exception {
+		if (Boolean.TRUE)  // TODO: not use the below check
+			return Boolean.TRUE;
+		
+		if (personCert.length != consentCert.length) {
+			System.out.println("length is not equal. personCert and consentCert");
+			return Boolean.FALSE;
+		}
+		
+		for (int i=0; i < personCert.length; i++) {
+			if (personCert[i] != consentCert[i]) {
+				System.out.println("length is not equal. personCert and consentCert");
+				return Boolean.FALSE;
+			}
+		}
+		
+		return Boolean.TRUE;
 	}
 	
 	private boolean isVerifyingOk(String signdataPEM) throws IOException
