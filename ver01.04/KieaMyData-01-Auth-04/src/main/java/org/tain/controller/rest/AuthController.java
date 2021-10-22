@@ -60,6 +60,26 @@ public class AuthController {
 	
 	/*
 	 * curl -X POST -H "Content-Type: application/json" -d @./1test.json http://localhost:8080/v0.1/rest/auth
+	 * {
+	 *   signeDataList: [
+	 *     {
+	 *       signedPersonInfoReq: XXX,
+	 *       signedConsent: XXX,
+	 *       orgCode: XXX,
+	 *       ucpidNonceInApi: XXX,
+	 *       consentNonceInApi: XXX,
+	 *       tx_id: XXX
+	 *     },{
+	 *       signedPersonInfoReq: XXX,
+	 *       signedConsent: XXX,
+	 *       orgCode: XXX,
+	 *       ucpidNonceInApi: XXX,
+	 *       consentNonceInApi: XXX,
+	 *       tx_id: XXX
+	 *     }
+	 *   ],
+	 *   caOrg: "SignKorea"
+	 * }
 	 */
 	@CrossOrigin(origins="*", methods = {RequestMethod.POST}, maxAge = 3600)
 	@RequestMapping(value = {"/auth"}, method = {RequestMethod.GET, RequestMethod.POST})
