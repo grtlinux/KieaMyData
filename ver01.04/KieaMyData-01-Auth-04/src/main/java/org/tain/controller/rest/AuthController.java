@@ -206,178 +206,198 @@ public class AuthController {
 		String SigningTimeUCPID_STR = ClientUtils.getSigningTime_str(signed_personInfoReq);
 		String SigningTimeConset_STR = ClientUtils.getSigningTime_str(signed_consentInfo);
 		
-		// TODO: KANG20211025
+		// Nonce check
 		String useNonce = this.prop.get("use.nonce", "false");
-		if(useNonce.equalsIgnoreCase("true")) {
+		if (useNonce.equalsIgnoreCase("true")) {
 			if (!ucpidNonceInCms.equals(ucpidNonceInApi) || !consentNonceInCms.equals(consentNonceInApi)) { /* Nonce 값이 동일할 경우 (재전송 공격 방지) */
 				//
 				return mapOut;
 			}
 		}
 		
+		String cpCode = "C0123456789A";
+		String useOrgCode = this.prop.get("use.orgCode", "false");
+		if (useOrgCode.equalsIgnoreCase("true")) {
+			cpCode = nodeIn.get("orgCode").asText();
+			if (cpCode == null) {
+				//
+				return mapOut;
+			}
+		}
+		
+		String cpRequestNumber = "123459";
+		String useTxId = this.prop.get("use.txId", "false");
+		if (useTxId.equalsIgnoreCase("true")) {
+			cpRequestNumber = nodeIn.get("tx_id").asText();
+			if (cpRequestNumber == null) {
+				//
+				return mapOut;
+			}
+		}
+		
 		if (Boolean.TRUE) {
-				if(isSameCertificate(personCert,consentCert)) { /* 두 서명 데이터에서 사용된 인증서가 동일할 경우 <- 해당 인증서 비교 함수는 정보제공자가 개발필요 */
-					/*
-					 * 위의 personInfoForVerify, consentInfoForVerify 값을 검증데몬 혹은 검증라이브러리에 파라미터값으로 넣어 서명 검증 실시.
-						personInfoForVerify - 검증
-						consentInfoForVerify(전송요구내역) - 검증 후 원문확인
-					 */
-					if (isVerifyingOk(personInfoForVerify) && isVerifyingOk(consentInfoForVerify)) {
-						/* 검증데몬에서 서명데이터의 검증이 정상적으로 성공하였을 경우 */
-						//VarUtils.setPropertiesPath("./config/route.properties");/*properties 파일 설정(절대 경로 혹은 상대경로)*/
-						VarUtils.setPropertiesPath(this.prop.get("file.route"));/*properties 파일 설정(절대 경로 혹은 상대경로)*/
+			if(isSameCertificate(personCert,consentCert)) { /* 두 서명 데이터에서 사용된 인증서가 동일할 경우 <- 해당 인증서 비교 함수는 정보제공자가 개발필요 */
+				/*
+				 * 위의 personInfoForVerify, consentInfoForVerify 값을 검증데몬 혹은 검증라이브러리에 파라미터값으로 넣어 서명 검증 실시.
+					personInfoForVerify - 검증
+					consentInfoForVerify(전송요구내역) - 검증 후 원문확인
+				 */
+				if (isVerifyingOk(personInfoForVerify) && isVerifyingOk(consentInfoForVerify)) {
+					/* 검증데몬에서 서명데이터의 검증이 정상적으로 성공하였을 경우 */
+					//VarUtils.setPropertiesPath("./config/route.properties");/*properties 파일 설정(절대 경로 혹은 상대경로)*/
+					VarUtils.setPropertiesPath(this.prop.get("file.route"));/*properties 파일 설정(절대 경로 혹은 상대경로)*/
+					
+					//String ucpidNonce = "정보제공자가 직접생성한 ucpidNonce";
+					//String ucpidNonce = ucpidNonceInCms;
+					String ucpidNonce = StringTools.getNonce();
+					ucpidNonce = Base64.encodeBase64URLSafeString(ucpidNonce.getBytes());
+					
+					//String cpCode ="정보제공자 cpCode (한국정보인증에 신청)"; // Test cpCode C0123456789A(ispurl www.mydata.co.kr)
+					//String cpCode = "C0123456789A";
+					//String cpCode = nodeIn.get("orgCode").asText("C0123456789A");
+					//String cpRequestNumber = "마이데이터사업자로부터 받은 tx_id 값";
+					//String cpRequestNumber = "123459";
+					//String ca_code ="마이데이터사업자로부터 받은 인증기관 기관코드"; // SignKorea / yessign / KICA / CrossCert
+					
+					//String ca_code = (String) mapIn.get("caOrg");
+					//if (ca_code == null)
+					//	ca_code = "SignKorea";
+					
+					//person_encoded = nodeIn.get("signedPersonInfoReq").asText();
+					try{
+						String signCertPath = VarUtils.getResourceFromProperty("signCert");
+						byte[] certificate = VarUtils.getFromFile(signCertPath);
+						VarUtils.setCertPassword("11223344");	//서버인증서 비밀번호
 						
-						//String ucpidNonce = "정보제공자가 직접생성한 ucpidNonce";
-						//String ucpidNonce = ucpidNonceInCms;
-						String ucpidNonce = StringTools.getNonce();
-						ucpidNonce = Base64.encodeBase64URLSafeString(ucpidNonce.getBytes());
+						/*
+						String serverIp = "";
+						int serverPort = 0;
 						
-						//String cpCode ="정보제공자 cpCode (한국정보인증에 신청)"; // Test cpCode C0123456789A(ispurl www.mydata.co.kr)
-						String cpCode = "C0123456789A";
-						//String cpCode = nodeIn.get("orgCode").asText("C0123456789A");
-						//String cpRequestNumber = "마이데이터사업자로부터 받은 tx_id 값";
-						String cpRequestNumber = "123459";
-						//String ca_code ="마이데이터사업자로부터 받은 인증기관 기관코드"; // SignKorea / yessign / KICA / CrossCert
-						
-						//String ca_code = (String) mapIn.get("caOrg");
-						//if (ca_code == null)
-						//	ca_code = "SignKorea";
-						
-						//person_encoded = nodeIn.get("signedPersonInfoReq").asText();
-						try{
-							String signCertPath = VarUtils.getResourceFromProperty("signCert");
-							byte[] certificate = VarUtils.getFromFile(signCertPath);
-							VarUtils.setCertPassword("11223344");	//서버인증서 비밀번호
-							
-							/*
-							String serverIp = "";
-							int serverPort = 0;
-							
-							if("SignKorea".equals(ca_code)){
-								serverIp = "211.175.81.101";
-								serverPort = 8098;
-							}
-							else if("yessign".equals(ca_code)){
-								serverIp = "203.233.91.231";
-								serverPort = 4719;
-							}
-							else if("KICA".equals(ca_code)){
-								serverIp = "121.254.188.161";
-								serverPort = 9090;
-							}
-							else if("CrossCert".equals(ca_code)){
-								serverIp = "203.248.34.63";
-								serverPort = 17586;
-							}
-							*/
-							
-							/* UCPID 서버로 보내기 위한 메시지 생성*/
-							byte[] UCPIDRequest = RequestUtils.getUCPIDRequest(ucpidNonce, cpCode, cpRequestNumber, certificate, signed_personInfoReq, 1);
-							/* UCPID 서버로 UCPIDRequest Message 전송 및 UCPIDResponse 획득 */
-							byte[] bUCPIDResponse = request2UCPID(UCPIDRequest, orgIp, orgPort);
-							
-							String status = ResponseUtils.getStatusCode(bUCPIDResponse);
-							System.out.println(">>>>> status = " + status);
-							if ("OK".equals(status)){
-								UCPIDResponse ucpidResponse = ResponseUtils.getInstance(bUCPIDResponse);
-								
-								int version = ucpidResponse.getVersion();
-								String UCPIDNonce = ucpidResponse.getUcpidNonce();
-								String CpRequestNumber = ucpidResponse.getCpRequestNumber();
-								String certDn = ucpidResponse.getCertDn();
-								String CpCode = ucpidResponse.getCpCode();
-								String di = ucpidResponse.getDi();
-								String realName = ucpidResponse.getRealName();
-								int gender = ucpidResponse.getGender();
-								int nationalInfo = ucpidResponse.getNationalInfo();
-								String birthDate = ucpidResponse.getBirthDate();
-								/*
-									ciupdate가 홀수일경우 ci이용 짝수일경우 ci2이용
-									ex) ciupdate=1 ci이용
-										ciupdate=2 ci2이용
-										ciupdate=3 ci이용
-										ciupdate=4 ci2이용
-								*/
-								int ciupdate = ucpidResponse.getCiUpdate();
-								String ci = ucpidResponse.getCi();
-								String ci2 = ucpidResponse.getCi2();
-								
-								System.out.println("personInfo's version ==============> " + version);
-								System.out.println("personInfo's UCPIDNonce ===========> " + UCPIDNonce);
-								System.out.println("personInfo's cpRequestNumber ======> " + CpRequestNumber);
-								System.out.println("personInfo's certDn ===============> " + certDn);
-								System.out.println("personInfo's cpCode ===============> " + CpCode);
-								System.out.println("personInfo's Di ===================> " + di);
-								System.out.println("personInfo's realName =============> " + realName);
-								System.out.println("personInfo's gender ===============> " + gender);
-								System.out.println("personInfo's nationalInfo =========> " + nationalInfo);
-								System.out.println("personInfo's birthDate ============> " + birthDate);
-								System.out.println("personInfo's ciupdate =============> " + ciupdate);
-								System.out.println("personInfo's ci ===================> " + ci);
-								System.out.println("personInfo's ci2 ==================> " + ci2);
-								
-								mapOut.put("version", version);
-								mapOut.put("UCPIDNonce", UCPIDNonce);
-								mapOut.put("CpRequestNumber", CpRequestNumber);
-								mapOut.put("certDn", certDn);
-								mapOut.put("CpCode", CpCode);
-								mapOut.put("di", di);
-								mapOut.put("realName", realName);
-								mapOut.put("gender", gender);
-								mapOut.put("nationalInfo", nationalInfo);
-								mapOut.put("birthDate", birthDate);
-								mapOut.put("ciupdate", ciupdate);
-								mapOut.put("ci", ci);
-								mapOut.put("ci2", ci2);
-								
-								// TODO: store auth data of SUCCESS
-								String storeAuthUrl = this.prop.get("store.auth.url");
-								if (storeAuthUrl != null && !"".equals(storeAuthUrl)) {
-									String strJson = new ObjectMapper().writeValueAsString(mapOut);
-									System.out.println(">>>>> JSON: " + strJson);
-									this.monHttpClient.post(storeAuthUrl, strJson);
-								}
-							}
-							else{
-								System.out.println("your UCPIDResponse is invalid. your error code is \"" + status + "\"");
-								// TODO: store auth data of FAIL-1
-							}
-						}catch(MydataException e){
-							// TODO: store auth data of FIAL-2
-							/**
-							 *
-								서명데이터(UCPIDRequest)가 잘못된경우로 동일로직으로 처리하여도 무관함
-								PARAMETER_EMPTY_IN_FUNCTION  / ERROR_IN_BYTE_TO_SEQUENCE / EMPTY_RETURN_VALUE_FROM_FUNCTION / INVALID_STRUCTURE
-							 */
-							if (ErrorCode.PARAMETER_EMPTY_IN_FUNCTION == e.getErrCode()){
-								// 함수에 인자값이 null일 경우
-								System.out.println("PARAMETER_EMPTY_IN_FUNCTION");
-							} else if(ErrorCode.ERROR_IN_BYTE_TO_SEQUENCE == e.getErrCode()){
-								// byte 값을 sequence로 변환실패
-								System.out.println("ERROR_IN_BYTE_TO_SEQUENCE");
-							} else if(ErrorCode.EMPTY_RETURN_VALUE_FROM_FUNCTION == e.getErrCode()){
-								// 함수로부터 리턴받은 값이 null일 경우
-								System.out.println("EMPTY_RETURN_VALUE_FROM_FUNCTION");
-							} else if(ErrorCode.INVALID_STRUCTURE == e.getErrCode()){
-								// 서명데이터의 asn.1 구조가 잘못된 경우
-								System.out.println("INVALID_STRUCTURE");
-							} else if(ErrorCode.NOT_INVALID_VALUE == e.getErrCode()){
-								// UCPID Version이 다른경우 (version 2)
-								System.out.println("NOT_INVALID_VALUE");
-							} else if(ErrorCode.EMPTY_VALUE_IN_PROPERTIES == e.getErrCode()){
-								//route.properties의 변수명이 다를경우
-								System.out.println("EMPTY_VALUE_IN_PROPERTIES");
-							}
-							System.out.println(">> " + e.getMessage() + ", " + e.getErrCode());
-						}catch(Exception e){
-							e.printStackTrace();
+						if("SignKorea".equals(ca_code)){
+							serverIp = "211.175.81.101";
+							serverPort = 8098;
 						}
-					} else{
-						System.out.println("CMS Verify not ok");
+						else if("yessign".equals(ca_code)){
+							serverIp = "203.233.91.231";
+							serverPort = 4719;
+						}
+						else if("KICA".equals(ca_code)){
+							serverIp = "121.254.188.161";
+							serverPort = 9090;
+						}
+						else if("CrossCert".equals(ca_code)){
+							serverIp = "203.248.34.63";
+							serverPort = 17586;
+						}
+						*/
+						
+						/* UCPID 서버로 보내기 위한 메시지 생성*/
+						byte[] UCPIDRequest = RequestUtils.getUCPIDRequest(ucpidNonce, cpCode, cpRequestNumber, certificate, signed_personInfoReq, 1);
+						/* UCPID 서버로 UCPIDRequest Message 전송 및 UCPIDResponse 획득 */
+						byte[] bUCPIDResponse = request2UCPID(UCPIDRequest, orgIp, orgPort);
+						
+						String status = ResponseUtils.getStatusCode(bUCPIDResponse);
+						System.out.println(">>>>> status = " + status);
+						if ("OK".equals(status)){
+							UCPIDResponse ucpidResponse = ResponseUtils.getInstance(bUCPIDResponse);
+							
+							int version = ucpidResponse.getVersion();
+							String UCPIDNonce = ucpidResponse.getUcpidNonce();
+							String CpRequestNumber = ucpidResponse.getCpRequestNumber();
+							String certDn = ucpidResponse.getCertDn();
+							String CpCode = ucpidResponse.getCpCode();
+							String di = ucpidResponse.getDi();
+							String realName = ucpidResponse.getRealName();
+							int gender = ucpidResponse.getGender();
+							int nationalInfo = ucpidResponse.getNationalInfo();
+							String birthDate = ucpidResponse.getBirthDate();
+							/*
+								ciupdate가 홀수일경우 ci이용 짝수일경우 ci2이용
+								ex) ciupdate=1 ci이용
+									ciupdate=2 ci2이용
+									ciupdate=3 ci이용
+									ciupdate=4 ci2이용
+							*/
+							int ciupdate = ucpidResponse.getCiUpdate();
+							String ci = ucpidResponse.getCi();
+							String ci2 = ucpidResponse.getCi2();
+							
+							System.out.println("personInfo's version ==============> " + version);
+							System.out.println("personInfo's UCPIDNonce ===========> " + UCPIDNonce);
+							System.out.println("personInfo's cpRequestNumber ======> " + CpRequestNumber);
+							System.out.println("personInfo's certDn ===============> " + certDn);
+							System.out.println("personInfo's cpCode ===============> " + CpCode);
+							System.out.println("personInfo's Di ===================> " + di);
+							System.out.println("personInfo's realName =============> " + realName);
+							System.out.println("personInfo's gender ===============> " + gender);
+							System.out.println("personInfo's nationalInfo =========> " + nationalInfo);
+							System.out.println("personInfo's birthDate ============> " + birthDate);
+							System.out.println("personInfo's ciupdate =============> " + ciupdate);
+							System.out.println("personInfo's ci ===================> " + ci);
+							System.out.println("personInfo's ci2 ==================> " + ci2);
+							
+							mapOut.put("version", version);
+							mapOut.put("UCPIDNonce", UCPIDNonce);
+							mapOut.put("CpRequestNumber", CpRequestNumber);
+							mapOut.put("certDn", certDn);
+							mapOut.put("CpCode", CpCode);
+							mapOut.put("di", di);
+							mapOut.put("realName", realName);
+							mapOut.put("gender", gender);
+							mapOut.put("nationalInfo", nationalInfo);
+							mapOut.put("birthDate", birthDate);
+							mapOut.put("ciupdate", ciupdate);
+							mapOut.put("ci", ci);
+							mapOut.put("ci2", ci2);
+							
+							// TODO: store auth data of SUCCESS
+							String storeAuthUrl = this.prop.get("store.auth.url");
+							if (storeAuthUrl != null && !"".equals(storeAuthUrl)) {
+								String strJson = new ObjectMapper().writeValueAsString(mapOut);
+								System.out.println(">>>>> JSON: " + strJson);
+								this.monHttpClient.post(storeAuthUrl, strJson);
+							}
+						}
+						else{
+							System.out.println("your UCPIDResponse is invalid. your error code is \"" + status + "\"");
+							// TODO: store auth data of FAIL-1
+						}
+					}catch(MydataException e){
+						// TODO: store auth data of FIAL-2
+						/**
+						 *
+							서명데이터(UCPIDRequest)가 잘못된경우로 동일로직으로 처리하여도 무관함
+							PARAMETER_EMPTY_IN_FUNCTION  / ERROR_IN_BYTE_TO_SEQUENCE / EMPTY_RETURN_VALUE_FROM_FUNCTION / INVALID_STRUCTURE
+						 */
+						if (ErrorCode.PARAMETER_EMPTY_IN_FUNCTION == e.getErrCode()){
+							// 함수에 인자값이 null일 경우
+							System.out.println("PARAMETER_EMPTY_IN_FUNCTION");
+						} else if(ErrorCode.ERROR_IN_BYTE_TO_SEQUENCE == e.getErrCode()){
+							// byte 값을 sequence로 변환실패
+							System.out.println("ERROR_IN_BYTE_TO_SEQUENCE");
+						} else if(ErrorCode.EMPTY_RETURN_VALUE_FROM_FUNCTION == e.getErrCode()){
+							// 함수로부터 리턴받은 값이 null일 경우
+							System.out.println("EMPTY_RETURN_VALUE_FROM_FUNCTION");
+						} else if(ErrorCode.INVALID_STRUCTURE == e.getErrCode()){
+							// 서명데이터의 asn.1 구조가 잘못된 경우
+							System.out.println("INVALID_STRUCTURE");
+						} else if(ErrorCode.NOT_INVALID_VALUE == e.getErrCode()){
+							// UCPID Version이 다른경우 (version 2)
+							System.out.println("NOT_INVALID_VALUE");
+						} else if(ErrorCode.EMPTY_VALUE_IN_PROPERTIES == e.getErrCode()){
+							//route.properties의 변수명이 다를경우
+							System.out.println("EMPTY_VALUE_IN_PROPERTIES");
+						}
+						System.out.println(">> " + e.getMessage() + ", " + e.getErrCode());
+					}catch(Exception e){
+						e.printStackTrace();
 					}
-				} else {
-					System.out.println("isSameCertificate not ok");
+				} else{
+					System.out.println("CMS Verify not ok");
 				}
+			} else {
+				System.out.println("isSameCertificate not ok");
+			}
 		}
 		//else{
 		//	System.out.println("Nonce not ok");
