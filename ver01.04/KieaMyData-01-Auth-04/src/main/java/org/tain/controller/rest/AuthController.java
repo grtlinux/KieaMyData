@@ -59,7 +59,8 @@ public class AuthController {
 	private MonHttpClient monHttpClient;
 	
 	/*
-	 * curl -X POST -H "Content-Type: application/json" -d @./1test.json http://localhost:8080/v0.1/rest/auth
+	 * 1. curl -X POST -H "Content-Type: application/json" -d @./1test.json http://localhost:8080/v0.1/rest/auth
+	 * 2. curl -X POST -H "Content-Type: application/json" -d @./2test.json http://localhost:8080/rest/auth
 	 * {
 	 *   signeDataList: [
 	 *     {
@@ -211,30 +212,44 @@ public class AuthController {
 		if (useNonce.equalsIgnoreCase("true")) {
 			if (!ucpidNonceInCms.equals(ucpidNonceInApi) || !consentNonceInCms.equals(consentNonceInApi)) { /* Nonce 값이 동일할 경우 (재전송 공격 방지) */
 				//
+				mapOut.put("retCode", "0010");
+				mapOut.put("retMsg", "Nonce check is not ok.");
 				return mapOut;
 			}
 		}
 		
+		// cp_code
 		String cpCode = "C0123456789A";
 		String useOrgCode = this.prop.get("use.orgCode", "false");
 		if (useOrgCode.equalsIgnoreCase("true")) {
 			cpCode = nodeIn.get("orgCode").asText();
 			if (cpCode == null) {
 				//
+				mapOut.put("retCode", "0020");
+				mapOut.put("retMsg", "value of orgCode is null.");
 				return mapOut;
 			}
 		}
 		
+		// tx_id
 		String cpRequestNumber = "123459";
 		String useTxId = this.prop.get("use.txId", "false");
 		if (useTxId.equalsIgnoreCase("true")) {
 			cpRequestNumber = nodeIn.get("tx_id").asText();
 			if (cpRequestNumber == null) {
 				//
+				mapOut.put("retCode", "0030");
+				mapOut.put("retMsg", "value of tx_id is null.");
 				return mapOut;
 			}
 		}
 		
+		//서버인증서 비밀번호
+		String svrCertPasswd = this.prop.get("svr.cert.password", "11223344");
+		
+		/*
+		 * 단건인증
+		 */
 		if (Boolean.TRUE) {
 			if(isSameCertificate(personCert,consentCert)) { /* 두 서명 데이터에서 사용된 인증서가 동일할 경우 <- 해당 인증서 비교 함수는 정보제공자가 개발필요 */
 				/*
@@ -267,7 +282,7 @@ public class AuthController {
 					try{
 						String signCertPath = VarUtils.getResourceFromProperty("signCert");
 						byte[] certificate = VarUtils.getFromFile(signCertPath);
-						VarUtils.setCertPassword("11223344");	//서버인증서 비밀번호
+						VarUtils.setCertPassword(svrCertPasswd);	//서버인증서 비밀번호
 						
 						/*
 						String serverIp = "";

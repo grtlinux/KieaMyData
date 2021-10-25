@@ -32,6 +32,7 @@ public class MyDataAuthProperties {
 		String useNonce = this.prop.getProperty("use.nonce", "false");
 		String useOrgCode = this.prop.getProperty("use.orgCode", "false");
 		String useTxId = this.prop.getProperty("use.txId", "false");
+		String svrCertPasswd = this.prop.getProperty("svr.cert.password", "11223344");
 		
 		log.info(">>>>> lstOrg: " + lstOrg);
 		log.info(">>>>> daemon: " + daemon);
@@ -39,9 +40,10 @@ public class MyDataAuthProperties {
 		log.info(">>>>> storeAuthUrl: " + storeAuthUrl);
 		
 		// KANG20211022: add
-		log.info(">>>>> useNonce   : " + useNonce);
-		log.info(">>>>> useOrgCode : " + useOrgCode);
-		log.info(">>>>> useTxId    : " + useTxId);
+		log.info(">>>>> useNonce      : " + useNonce);
+		log.info(">>>>> useOrgCode    : " + useOrgCode);
+		log.info(">>>>> useTxId       : " + useTxId);
+		log.info(">>>>> svrCertPasswd : " + svrCertPasswd);
 	}
 	
 	public String get(String key) {
