@@ -28,13 +28,27 @@ public class MyDataAuthProperties {
 		String routeFile = this.prop.getProperty("file.route");
 		String storeAuthUrl = this.prop.getProperty("store.auth.url");
 		
+		// KANG20211022: add
+		String useNonce = this.prop.getProperty("use.nonce", "false");
+		String useOrgCode = this.prop.getProperty("use.orgCode", "false");
+		String useTxId = this.prop.getProperty("use.txId", "false");
+		
 		log.info(">>>>> lstOrg: " + lstOrg);
 		log.info(">>>>> daemon: " + daemon);
 		log.info(">>>>> routeFile: " + routeFile);
 		log.info(">>>>> storeAuthUrl: " + storeAuthUrl);
+		
+		// KANG20211022: add
+		log.info(">>>>> useNonce   : " + useNonce);
+		log.info(">>>>> useOrgCode : " + useOrgCode);
+		log.info(">>>>> useTxId    : " + useTxId);
 	}
 	
 	public String get(String key) {
 		return this.prop.getProperty(key);
+	}
+	
+	public String get(String key, String defValue) {
+		return this.prop.getProperty(key, defValue);
 	}
 }

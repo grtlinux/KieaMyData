@@ -193,8 +193,10 @@ public class AuthController {
 		String consentNonceInCms = ClientUtils.get_consentNonce_from_signdConsentInfo(signed_consentInfo);
 		
 		/* 5. 마이데이터 사업자로부터 전달 받은 nonce 값 저장 */
-		//String ucpidNonceInApi = "마이데이터사업자로부터 통합인증 api -002를 통해 전달 받은 ucpidNonce 값";
-		//String consentNonceInApi = "마이데이터사업자로부터 통합인증 api -002를 통해 전달 받은 consentNonce 값";
+		String ucpidNonceInApi = null; //"마이데이터사업자로부터 통합인증 api -002를 통해 전달 받은 ucpidNonce 값";
+		String consentNonceInApi = null; //"마이데이터사업자로부터 통합인증 api -002를 통해 전달 받은 consentNonce 값";
+		ucpidNonceInApi = nodeIn.get("ucpidNonceInApi").asText();
+		consentNonceInApi = nodeIn.get("consentNonceInApi").asText();
 
 		/* 각 서명데이터의 서명시간(Date형) 획득 */
 		Date SigningTimeUCPID = (Date) ClientUtils.getSigningTime(signed_personInfoReq);
@@ -204,8 +206,16 @@ public class AuthController {
 		String SigningTimeUCPID_STR = ClientUtils.getSigningTime_str(signed_personInfoReq);
 		String SigningTimeConset_STR = ClientUtils.getSigningTime_str(signed_consentInfo);
 		
-		//if(ucpidNonceInCms.equals(ucpidNonceInApi) && consentNonceInCms.equals(consentNonceInApi)){ /* Nonce 값이 동일할 경우 (재전송 공격 방지) */
-		{
+		// TODO: KANG20211025
+		String useNonce = this.prop.get("use.nonce", "false");
+		if(useNonce.equalsIgnoreCase("true")) {
+			if (!ucpidNonceInCms.equals(ucpidNonceInApi) || !consentNonceInCms.equals(consentNonceInApi)) { /* Nonce 값이 동일할 경우 (재전송 공격 방지) */
+				//
+				return mapOut;
+			}
+		}
+		
+		if (Boolean.TRUE) {
 				if(isSameCertificate(personCert,consentCert)) { /* 두 서명 데이터에서 사용된 인증서가 동일할 경우 <- 해당 인증서 비교 함수는 정보제공자가 개발필요 */
 					/*
 					 * 위의 personInfoForVerify, consentInfoForVerify 값을 검증데몬 혹은 검증라이브러리에 파라미터값으로 넣어 서명 검증 실시.
