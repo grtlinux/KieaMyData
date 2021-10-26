@@ -62,7 +62,7 @@ public class AuthController {
 	 * 1. curl -X POST -H "Content-Type: application/json" -d @./1test.json http://localhost:8080/v0.1/rest/auth
 	 * 2. curl -X POST -H "Content-Type: application/json" -d @./2test.json http://localhost:8080/rest/auth
 	 * {
-	 *   signeDataList: [
+	 *   signedDataList: [
 	 *     {
 	 *       signedPersonInfoReq: XXX,
 	 *       signedConsent: XXX,
@@ -167,6 +167,15 @@ public class AuthController {
 		return new ResponseEntity<>(mapRet, headers, HttpStatus.OK);
 	}
 	
+	/**
+	 * 
+	 * @param nodeIn
+	 * @param orgName
+	 * @param orgIp
+	 * @param orgPort
+	 * @return
+	 * @throws Exception
+	 */
 	private Map<String,Object> testJob03(JsonNode nodeIn, String orgName, String orgIp, int orgPort) throws Exception {
 		Map<String,Object> mapOut = new HashMap<>();
 		
@@ -192,12 +201,12 @@ public class AuthController {
 		/*  4. 각 서명 데이터에서 nonce 값 획득 */
 		String ucpidNonceInCms = ClientUtils.get_ucpidNonce_from_signedPersonInfoReq(signed_personInfoReq);
 		String consentNonceInCms = ClientUtils.get_consentNonce_from_signdConsentInfo(signed_consentInfo);
+		System.out.println(">>>>> ucpidNonceInCms   :" + ucpidNonceInCms);
+		System.out.println(">>>>> consentNonceInCms :" + consentNonceInCms);
 		
 		/* 5. 마이데이터 사업자로부터 전달 받은 nonce 값 저장 */
 		String ucpidNonceInApi = null; //"마이데이터사업자로부터 통합인증 api -002를 통해 전달 받은 ucpidNonce 값";
 		String consentNonceInApi = null; //"마이데이터사업자로부터 통합인증 api -002를 통해 전달 받은 consentNonce 값";
-		ucpidNonceInApi = nodeIn.get("ucpidNonceInApi").asText();
-		consentNonceInApi = nodeIn.get("consentNonceInApi").asText();
 
 		/* 각 서명데이터의 서명시간(Date형) 획득 */
 		Date SigningTimeUCPID = (Date) ClientUtils.getSigningTime(signed_personInfoReq);
@@ -210,6 +219,10 @@ public class AuthController {
 		// Nonce check
 		String useNonce = this.prop.get("use.nonce", "false");
 		if (useNonce.equalsIgnoreCase("true")) {
+			ucpidNonceInApi = "XXX";
+			consentNonceInApi = "XXX";
+			ucpidNonceInApi = nodeIn.get("ucpidNonceInApi").asText();
+			consentNonceInApi = nodeIn.get("consentNonceInApi").asText();
 			if (!ucpidNonceInCms.equals(ucpidNonceInApi) || !consentNonceInCms.equals(consentNonceInApi)) { /* Nonce 값이 동일할 경우 (재전송 공격 방지) */
 				//
 				mapOut.put("retCode", "0010");
@@ -219,7 +232,7 @@ public class AuthController {
 		}
 		
 		// cp_code
-		String cpCode = "C0123456789A";
+		String cpCode = "_C0123456789A";
 		String useOrgCode = this.prop.get("use.orgCode", "false");
 		if (useOrgCode.equalsIgnoreCase("true")) {
 			cpCode = nodeIn.get("orgCode").asText();
@@ -232,7 +245,7 @@ public class AuthController {
 		}
 		
 		// tx_id
-		String cpRequestNumber = "123459";
+		String cpRequestNumber = "_123459";
 		String useTxId = this.prop.get("use.txId", "false");
 		if (useTxId.equalsIgnoreCase("true")) {
 			cpRequestNumber = nodeIn.get("tx_id").asText();
@@ -365,20 +378,28 @@ public class AuthController {
 							mapOut.put("ci", ci);
 							mapOut.put("ci2", ci2);
 							
-							// TODO: store auth data of SUCCESS
-							String storeAuthUrl = this.prop.get("store.auth.url");
-							if (storeAuthUrl != null && !"".equals(storeAuthUrl)) {
-								String strJson = new ObjectMapper().writeValueAsString(mapOut);
-								System.out.println(">>>>> JSON: " + strJson);
-								this.monHttpClient.post(storeAuthUrl, strJson);
+							// store auth data of SUCCESS
+							
+							String useStoreAuth = this.prop.get("use.store.auth", "false");
+							if (useStoreAuth.equalsIgnoreCase("true")) {
+								String storeAuthUrl = this.prop.get("store.auth.url");
+								if (storeAuthUrl != null && !"".equals(storeAuthUrl)) {
+									String strJson = new ObjectMapper().writeValueAsString(mapOut);
+									System.out.println(">>>>> JSON: " + strJson);
+									this.monHttpClient.post(storeAuthUrl, strJson);
+								}
 							}
-						}
-						else{
+							
+							// Success message
+							mapOut.put("retCode", "0000");
+							mapOut.put("retMsg", "Success");
+						} else {
 							System.out.println("your UCPIDResponse is invalid. your error code is \"" + status + "\"");
 							// TODO: store auth data of FAIL-1
+							mapOut.put("retCode", "0040");
+							mapOut.put("retMsg", "your UCPIDResponse is invalid");
 						}
-					}catch(MydataException e){
-						// TODO: store auth data of FIAL-2
+					} catch(MydataException e) {
 						/**
 						 *
 							서명데이터(UCPIDRequest)가 잘못된경우로 동일로직으로 처리하여도 무관함
@@ -387,31 +408,49 @@ public class AuthController {
 						if (ErrorCode.PARAMETER_EMPTY_IN_FUNCTION == e.getErrCode()){
 							// 함수에 인자값이 null일 경우
 							System.out.println("PARAMETER_EMPTY_IN_FUNCTION");
+							mapOut.put("retCode", "0051");
+							mapOut.put("retMsg", "PARAMETER_EMPTY_IN_FUNCTION");
 						} else if(ErrorCode.ERROR_IN_BYTE_TO_SEQUENCE == e.getErrCode()){
 							// byte 값을 sequence로 변환실패
 							System.out.println("ERROR_IN_BYTE_TO_SEQUENCE");
+							mapOut.put("retCode", "0052");
+							mapOut.put("retMsg", "ERROR_IN_BYTE_TO_SEQUENCE");
 						} else if(ErrorCode.EMPTY_RETURN_VALUE_FROM_FUNCTION == e.getErrCode()){
 							// 함수로부터 리턴받은 값이 null일 경우
 							System.out.println("EMPTY_RETURN_VALUE_FROM_FUNCTION");
+							mapOut.put("retCode", "0053");
+							mapOut.put("retMsg", "EMPTY_RETURN_VALUE_FROM_FUNCTION");
 						} else if(ErrorCode.INVALID_STRUCTURE == e.getErrCode()){
 							// 서명데이터의 asn.1 구조가 잘못된 경우
 							System.out.println("INVALID_STRUCTURE");
+							mapOut.put("retCode", "0054");
+							mapOut.put("retMsg", "INVALID_STRUCTURE");
 						} else if(ErrorCode.NOT_INVALID_VALUE == e.getErrCode()){
 							// UCPID Version이 다른경우 (version 2)
 							System.out.println("NOT_INVALID_VALUE");
+							mapOut.put("retCode", "0055");
+							mapOut.put("retMsg", "NOT_INVALID_VALUE");
 						} else if(ErrorCode.EMPTY_VALUE_IN_PROPERTIES == e.getErrCode()){
 							//route.properties의 변수명이 다를경우
 							System.out.println("EMPTY_VALUE_IN_PROPERTIES");
+							mapOut.put("retCode", "0056");
+							mapOut.put("retMsg", "EMPTY_VALUE_IN_PROPERTIES");
 						}
 						System.out.println(">> " + e.getMessage() + ", " + e.getErrCode());
 					}catch(Exception e){
 						e.printStackTrace();
+						mapOut.put("retCode", "0057");
+						mapOut.put("retMsg", "other Exception");
 					}
 				} else{
 					System.out.println("CMS Verify not ok");
+					mapOut.put("retCode", "0060");
+					mapOut.put("retMsg", "CMS Verify not ok");
 				}
 			} else {
 				System.out.println("isSameCertificate not ok");
+				mapOut.put("retCode", "0070");
+				mapOut.put("retMsg", "isSameCertificate not ok");
 			}
 		}
 		//else{
@@ -458,7 +497,7 @@ public class AuthController {
 		
 		SKVerifyc        verifyc   = new SKVerifyc();  /* 데몬 통신 클래스 */
 		SKSignedDataInfo data_info = new SKSignedDataInfo(); /* 검증할 데이터를 입력받는 클래스 */
-		SKVerifyExtInfo  ext        = new SKVerifyExtInfo(); /* 검증후 인증서 세부정보가 담기는 클래스 */
+		SKVerifyExtInfo  ext       = new SKVerifyExtInfo(); /* 검증후 인증서 세부정보가 담기는 클래스 */
 		
 		/***************************************************************************************
 		verifySignCipher
