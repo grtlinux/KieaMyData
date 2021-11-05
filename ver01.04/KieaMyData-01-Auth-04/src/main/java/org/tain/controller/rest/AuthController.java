@@ -364,6 +364,10 @@ public class AuthController {
 							System.out.println("personInfo's ci ===================> " + ci);
 							System.out.println("personInfo's ci2 ==================> " + ci2);
 							
+							// KANG-20211105: add the below
+							mapOut.put("signedPersonInfoReq", person_encoded);
+							mapOut.put("signedConsent", consent_encoded);
+							
 							mapOut.put("version", version);
 							mapOut.put("UCPIDNonce", UCPIDNonce);
 							mapOut.put("CpRequestNumber", CpRequestNumber);
