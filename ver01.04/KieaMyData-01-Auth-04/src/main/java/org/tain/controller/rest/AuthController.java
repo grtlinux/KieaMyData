@@ -319,6 +319,14 @@ public class AuthController {
 						}
 						*/
 						
+						/* KANG-20211116: add for test */
+						log.info("============================================");
+						log.info("-----> KANG-20211116: add for test <-----");
+						log.info("-----> orgIp: " + orgIp);
+						log.info("-----> orgPort: " + orgPort);
+						log.info("-----> lstOrg: " + cpCode);
+						log.info("-----> cpRequestNumber: " + cpRequestNumber);
+						
 						/* UCPID 서버로 보내기 위한 메시지 생성*/
 						byte[] UCPIDRequest = RequestUtils.getUCPIDRequest(ucpidNonce, cpCode, cpRequestNumber, certificate, signed_personInfoReq, 1);
 						/* UCPID 서버로 UCPIDRequest Message 전송 및 UCPIDResponse 획득 */
