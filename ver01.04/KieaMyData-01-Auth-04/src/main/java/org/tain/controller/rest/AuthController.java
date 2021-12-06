@@ -81,6 +81,12 @@ public class AuthController {
 	 *   ],
 	 *   caOrg: "SignKorea"
 	 * }
+	 * 
+	 * 
+	 * KANG-20211126:
+	 *  $ jar cvfm mydata_v2.jar mydata_v2/META-INF/MANIFEST.MF -C mydata_v2/* .
+	 *  $ jar cvf mydata_v2.jar -C mydata_v2/* .
+	 *  $ jar cvf mydata_v2.jar -C SK .
 	 */
 	@CrossOrigin(origins="*", methods = {RequestMethod.POST}, maxAge = 3600)
 	@RequestMapping(value = {"/auth"}, method = {RequestMethod.GET, RequestMethod.POST})
