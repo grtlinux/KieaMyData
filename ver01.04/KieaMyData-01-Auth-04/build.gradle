@@ -58,8 +58,8 @@ dependencies {
 	implementation name: 'bcpkix-jdk15on-1.59'
 	implementation name: 'bcprov-jdk15on-1.59'
 	implementation name: 'local_policy'
-	//implementation name: 'mydata_v1.9.9'
-	implementation name: 'mydata_v2'  // KANG-20211126: change the above
+	implementation name: 'mydata_v1.9.9'
+	//implementation name: 'mydata_v2'  // KANG-20211126: change the above
 	implementation name: 'US_export_policy'
 	implementation name: 'SignKorea.20210820'
 }
